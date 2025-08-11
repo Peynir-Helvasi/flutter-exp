@@ -8,7 +8,7 @@ class ApiService{
 
   //kütüphane yüklemesi başarısız olduğu için burdan kullanulmaya devam ediliyor. daha sonrasında env den çekilecekk !!!!!
   static const String _baseUrl = "http://www.omdbapi.com/";
-  static const String _apiKey = "cb41e877";
+  static const String _apiKey = "";
 
 
   //search f
