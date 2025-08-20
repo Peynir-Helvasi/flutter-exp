@@ -1,10 +1,17 @@
+import 'package:demo/shell.dart';
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
+import 'controllers/nav_controller.dart';
 
+void main() async{
+  await dotenv.load(fileName: ".env");
 
-
-void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers:  [ChangeNotifierProvider(create: (_) => NavController())],
+    child: const MyApp(),)
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -16,7 +23,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Film Rehberi',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomeScreen(), // Arama ekranı (setState)
+      home: const HomeShell(), 
     );
   }
 }

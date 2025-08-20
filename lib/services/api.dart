@@ -3,15 +3,22 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/movie.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService{
+ 
+  
 
-  //kütüphane yüklemesi başarısız olduğu için burdan kullanulmaya devam ediliyor. daha sonrasında env den çekilecekk !!!!!
-  static const String _baseUrl = "http://www.omdbapi.com/";
-  static const String _apiKey = "";
+  static final String _baseUrl = dotenv.env['APİ_URL'] ?? '';
+  static final String _apiKey = dotenv.env['API_KEY'] ?? '';
+  
+  static void printF(){
+    print(_baseUrl);
+    print(_apiKey);
+  }
 
 
-  //search f
+  //search for titles
   static Future<List<Movie>> fetchMovies(String query) async{
     final url = Uri.parse("$_baseUrl?apikey=$_apiKey&s=$query");
 
@@ -37,7 +44,7 @@ class ApiService{
 
  }
   
-  //search F
+  //search for details
    static Future<Movie> fetchMovieDetail(String imdbID) async {
     final url = Uri.parse("$_baseUrl?apikey=$_apiKey&i=$imdbID");
 
