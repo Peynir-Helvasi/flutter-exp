@@ -8,6 +8,7 @@ void main() async{
   await dotenv.load(fileName: ".env");
 
   runApp(
+    // all code under provider 
     MultiProvider(
       providers:  [ChangeNotifierProvider(create: (_) => NavController())],
     child: const MyApp(),)

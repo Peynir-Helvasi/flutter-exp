@@ -1,3 +1,6 @@
+// This is for navigating on the app
+
+import 'package:demo/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'controllers/nav_controller.dart';
@@ -10,6 +13,8 @@ class HomeShell extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+
+    
     final nav = context.watch<NavController>();
 
 
@@ -21,7 +26,7 @@ class HomeShell extends StatelessWidget{
         index: nav.index,
         children: [
           HomeScreen(),
-          Center(child: Text('Search')),   // geçici placeholder
+          SearchScreen(),   
           Center(child: Text('Profile')),  // geçici placeholder
         ],
       ),
