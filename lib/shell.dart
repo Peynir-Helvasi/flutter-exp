@@ -30,7 +30,7 @@ class HomeShell extends StatelessWidget{
         children: [
           HomeScreen(),
           SearchScreen(),   
-          ProfileScreen(),  // geçici placeholder
+          ProfileScreen(),  
         ],
       ),
       bottomNavigationBar: NavigationBar(

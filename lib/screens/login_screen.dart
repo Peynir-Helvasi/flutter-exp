@@ -1,4 +1,5 @@
-// lib/screens/login_screen.dart
+// security could be higher
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth.dart';

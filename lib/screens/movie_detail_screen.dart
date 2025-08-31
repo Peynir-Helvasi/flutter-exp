@@ -1,8 +1,10 @@
-// lib/screens/movie_detail_screen.dart
+
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/movie_detail_vm.dart';
-import '../widgets/fav_button.dart'; // FavButtonImdb
+import '../widgets/fav_button.dart'; 
 
 class MovieDetailScreen extends StatelessWidget {
   final String imdbID;
@@ -37,7 +39,7 @@ class MovieDetailScreen extends StatelessWidget {
                 if (err != null) return Center(child: Text(err));
                 if (m == null) return const Center(child: Text("Film bulunamadı"));
 
-                // Genre parçala (N/A ise boş bırak)
+                // 
                 final genres = (m.genre != null && m.genre!.trim().isNotEmpty && m.genre != 'N/A')
                     ? m.genre!.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
                     : <String>[];
@@ -60,7 +62,7 @@ class MovieDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
 
-                      // Baloncuklar: Yıl, IMDb, Türler
+                      // içeirk
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
@@ -89,7 +91,6 @@ class MovieDetailScreen extends StatelessWidget {
   }
 }
 
-/// Basit “pill” (baloncuk) bileşeni
 class InfoPill extends StatelessWidget {
   final String text;
   final IconData? icon;
@@ -101,7 +102,7 @@ class InfoPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: cs.surfaceVariant.withOpacity(0.75),
+        color: cs.surfaceContainerHighest.withOpacity(0.75),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: cs.outline.withOpacity(0.25)),
       ),
@@ -125,7 +126,7 @@ class InfoPill extends StatelessWidget {
   }
 }
 
-/// “Özet” başlığı ve altında içerik paneli
+/// Özet başlığı 
 class Section extends StatelessWidget {
   final String title;
   final Widget child;
@@ -149,7 +150,7 @@ class Section extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: cs.surfaceVariant.withOpacity(0.45),
+            color: cs.surfaceContainerHighest.withOpacity(0.45),
             borderRadius: BorderRadius.circular(14),
           ),
           child: DefaultTextStyle.merge(
