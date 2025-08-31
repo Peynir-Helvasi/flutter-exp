@@ -1,6 +1,8 @@
+// lib/screens/movie_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/movie_detail_vm.dart';
+import '../widgets/fav_button.dart'; // FavButtonImdb
 
 class MovieDetailScreen extends StatelessWidget {
   final String imdbID;
@@ -10,36 +12,152 @@ class MovieDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => MovieDetailViewModel()..load(imdbID),
-      child: Scaffold(
-        appBar: AppBar(title: const Text("Film Detayı")),
-        body: Consumer<MovieDetailViewModel>(
-          builder: (_, vm, __) {
-            if (vm.isLoading) return const Center(child: CircularProgressIndicator());
-            if (vm.error != null) return Center(child: Text(vm.error!));
-            if (vm.movie == null) return const Center(child: Text("Film bulunamadı"));
+      child: Consumer<MovieDetailViewModel>(
+        builder: (_, vm, __) {
+          final isLoading = vm.isLoading;
+          final err = vm.error;
+          final m = vm.movie;
 
-            final m = vm.movie!;
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (m.poster.isNotEmpty)
-                    Center(child: Image.network(m.poster, height: 300, fit: BoxFit.cover)),
-                  const SizedBox(height: 16),
-                  Text(m.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  Text("Yıl: ${m.year}"),
-                  if (m.genre != null) Text("Tür: ${m.genre}"),
-                  if (m.imdbRating != null) Text("IMDB: ${m.imdbRating}"),
-                  const SizedBox(height: 12),
-                  Text(m.plot ?? "Açıklama yok."),
-                ],
-              ),
-            );
-          },
-        ),
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(m?.title ?? "Film Detayı"),
+              actions: [
+                if (m != null)
+                  FavButtonImdb(
+                    imdbId: imdbID,
+                    title: m.title,
+                    posterUrl: (m.poster.isNotEmpty && m.poster != 'N/A') ? m.poster : null,
+                    year: m.year,
+                  ),
+              ],
+            ),
+            body: Builder(
+              builder: (_) {
+                if (isLoading) return const Center(child: CircularProgressIndicator());
+                if (err != null) return Center(child: Text(err));
+                if (m == null) return const Center(child: Text("Film bulunamadı"));
+
+                // Genre parçala (N/A ise boş bırak)
+                final genres = (m.genre != null && m.genre!.trim().isNotEmpty && m.genre != 'N/A')
+                    ? m.genre!.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
+                    : <String>[];
+
+                final hasRating = (m.imdbRating != null && m.imdbRating!.isNotEmpty && m.imdbRating != 'N/A');
+
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (m.poster.isNotEmpty && m.poster != 'N/A')
+                        Center(child: Image.network(m.poster, height: 280, fit: BoxFit.cover)),
+                      const SizedBox(height: 16),
+
+                      // Başlık
+                      Text(
+                        m.title,
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Baloncuklar: Yıl, IMDb, Türler
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          if (m.year.isNotEmpty) InfoPill(text: m.year),
+                          if (hasRating) InfoPill(text: 'IMDb ${m.imdbRating}', icon: Icons.star_rounded),
+                          for (final g in genres) InfoPill(text: g),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+                      // Özet bölümü
+                      Section(
+                        title: 'Özet',
+                        child: Text(m.plot ?? 'Açıklama yok.'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
+    );
+  }
+}
+
+/// Basit “pill” (baloncuk) bileşeni
+class InfoPill extends StatelessWidget {
+  final String text;
+  final IconData? icon;
+  const InfoPill({super.key, required this.text, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: cs.surfaceVariant.withOpacity(0.75),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: cs.outline.withOpacity(0.25)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 16),
+            const SizedBox(width: 6),
+          ],
+          Text(
+            text,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: cs.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// “Özet” başlığı ve altında içerik paneli
+class Section extends StatelessWidget {
+  final String title;
+  final Widget child;
+  const Section({super.key, required this.title, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: cs.onSurface,
+              ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: cs.surfaceVariant.withOpacity(0.45),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: DefaultTextStyle.merge(
+            style: TextStyle(color: cs.onSurface),
+            child: child,
+          ),
+        ),
+      ],
     );
   }
 }

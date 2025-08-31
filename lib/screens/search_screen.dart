@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../models/movie.dart';
 import '../services/api.dart';
@@ -14,19 +16,44 @@ class _SearchScreenState extends State<SearchScreen> {
   final _controller = TextEditingController();
   Future<List<Movie>>? _future;
 
+  Timer? _debounce;
+  static const _debounceMs = 450;
+
+
+
   @override
   void dispose() {
+    _debounce?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
-  void _doSearch() {
-    final q = _controller.text.trim();
-    if (q.isEmpty) return;
-    setState(() {
-      _future = ApiService.fetchMovies(q);
-    });
-  }
+  void onChanged(String text) {
+  _debounce?.cancel();
+  final q = text.trim();
+  _debounce = Timer(const Duration(milliseconds: _debounceMs), () {
+    if (!mounted) return;
+
+    if (q.isEmpty) {
+      setState(() {                      
+        _future = null;
+      });
+    } else {
+      final future = ApiService.fetchMovies(q); 
+      setState(() {_future = future;});
+    }
+  });
+}
+
+
+
+  // void _doSearch() {
+  //   final q = _controller.text.trim();
+  //   if (q.isEmpty) return;
+  //   setState(() {
+  //     _future = ApiService.fetchMovies(q);
+  //   });
+  // }
 
   Widget _posterThumb(String url) {
     if (url.isEmpty) {
@@ -63,7 +90,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: TextField(
                     controller: _controller,
                     textInputAction: TextInputAction.search,
-                    onSubmitted: (_) => _doSearch(),
+                    onChanged: onChanged,
                     decoration: const InputDecoration(
                       hintText: 'Örn: Batman',
                       border: OutlineInputBorder(),
@@ -72,16 +99,12 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _doSearch,
-                  child: const Text('Ara'),
-                ),
               ],
             ),
           ),
           Expanded(
             child: _future == null
-                ? const Center(child: Text('Aramak için bir şey yaz ve Ara\'ya bas.'))
+                ? const Center(child: Text(''))
                 : FutureBuilder<List<Movie>>(
                     future: _future,
                     builder: (context, snap) {

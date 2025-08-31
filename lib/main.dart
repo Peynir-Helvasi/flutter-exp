@@ -1,17 +1,29 @@
+// lib/main.dart
 import 'package:demo/shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'controllers/nav_controller.dart';
 
-void main() async{
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
+import 'screens/login_screen.dart'; 
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();             
   await dotenv.load(fileName: ".env");
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
-    // all code under provider 
     MultiProvider(
-      providers:  [ChangeNotifierProvider(create: (_) => NavController())],
-    child: const MyApp(),)
+      providers: [
+        ChangeNotifierProvider(create: (_) => NavController()),
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -23,8 +35,36 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Film Rehberi',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomeShell(), 
+      theme: ThemeData(
+      useMaterial3: true, 
+      colorSchemeSeed: Colors.indigo,
+      scaffoldBackgroundColor: Colors.transparent,
+      ),
+  //     builder: (context, child) {
+  //       return Stack(
+  //         children: [
+  //           Positioned.fill(
+  //             child: Image.asset(
+  //             'images/background.png',
+  //             fit: BoxFit.cover,
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // },
+      //kullanıcı giriş yaptıysa HomeShell değilse Login
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.waiting) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          }
+          if (snap.data != null) {
+            return const HomeShell();  
+          }
+          return const LoginScreen();  
+        },
+      ),
     );
   }
 }

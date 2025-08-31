@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "696104482910",
+    "project_id": "moviecli",
+    "storage_bucket": "moviecli.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:696104482910:android:74412afa6f2ba22d925ccf",
+        "android_client_info": {
+          "package_name": "com.example.demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBy34npA0OS7X2EyFSNYv1cwqf4gvfSSO0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
